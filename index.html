@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Create and claim Victorian School Nurses Association CPD certificates.">
+  <title>VSNA Certificate Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #002b49;
+      --navy-light: #0b466d;
+      --gold: #c5a059;
+      --gold-light: #ead9b5;
+      --ink: #172330;
+      --muted: #647282;
+      --paper: #fffefa;
+      --line: #d9dee3;
+      --shadow: 0 24px 70px rgba(0, 43, 73, .16);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-height: 100%; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(197, 160, 89, .12), transparent 30rem),
+        linear-gradient(145deg, #f4f7f9, #e8eef2);
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    button, input { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    [hidden] { display: none !important; }
+
+    .admin-shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 44px 0 64px;
+    }
+
+    .admin-header {
+      max-width: 680px;
+      margin-bottom: 30px;
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--gold);
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, p { margin-top: 0; }
+
+    h1 {
+      margin-bottom: 12px;
+      color: var(--navy);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(2.1rem, 5vw, 3.5rem);
+      line-height: 1.04;
+    }
+
+    .intro {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .admin-card {
+      padding: clamp(24px, 4vw, 42px);
+      border: 1px solid rgba(0, 43, 73, .08);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, .94);
+      box-shadow: var(--shadow);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      color: var(--navy);
+      font-size: .86rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      min-height: 48px;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+    }
+
+    input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(197, 160, 89, .18);
+    }
+
+    .hint {
+      margin: -1px 0 0;
+      color: var(--muted);
+      font-size: .75rem;
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .button {
+      min-height: 46px;
+      padding: 11px 18px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .16s, background .16s, border-color .16s;
+    }
+
+    .button:hover { transform: translateY(-1px); }
+
+    .button.primary {
+      color: #fff;
+      background: var(--navy);
+    }
+
+    .button.primary:hover { background: var(--navy-light); }
+
+    .button.secondary {
+      color: var(--navy);
+      border-color: rgba(0, 43, 73, .22);
+      background: #fff;
+    }
+
+    .link-result {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid #e7eaed;
+    }
+
+    .link-result input {
+      min-width: 0;
+      color: var(--muted);
+      background: #f7f9fa;
+    }
+
+    .status {
+      min-height: 1.25em;
+      margin: 10px 0 0;
+      color: #2d6b4f;
+      font-size: .8rem;
+      font-weight: 600;
+    }
+
+    .recipient-shell {
+      min-height: 100vh;
+      padding: clamp(12px, 2vw, 26px);
+    }
+
+    .claim-view {
+      min-height: calc(100vh - clamp(24px, 4vw, 52px));
+      display: grid;
+      place-items: center;
+    }
+
+    .claim-card {
+      width: min(570px, 100%);
+      padding: clamp(30px, 7vw, 54px);
+      border-top: 5px solid var(--gold);
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 78px;
+      height: 78px;
+      margin: 0 auto 22px;
+      place-items: center;
+      border: 2px solid var(--gold);
+      border-radius: 50%;
+      color: var(--navy);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: .06em;
+    }
+
+    .claim-card h1 {
+      margin-bottom: 15px;
+      font-size: clamp(2rem, 7vw, 3rem);
+    }
+
+    .claim-logo {
+      display: grid;
+      width: 140px;
+      height: 90px;
+      margin: 0 auto 18px;
+      place-items: center;
+    }
+
+    .claim-logo img {
+      display: block;
+      max-width: 140px;
+      max-height: 90px;
+      object-fit: contain;
+    }
+
+    .claim-logo .brand-mark { margin: 0; }
+
+    .claim-copy {
+      margin-bottom: 27px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .claim-copy strong { color: var(--ink); }
+
+    .claim-form {
+      display: grid;
+      gap: 12px;
+      text-align: left;
+    }
+
+    .claim-form .button { margin-top: 4px; }
+
+    .certificate-view {
+      min-height: calc(100vh - clamp(24px, 4vw, 52px));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    .certificate-actions {
+      position: fixed;
+      z-index: 10;
+      top: 18px;
+      right: 18px;
+      left: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .certificate {
+      position: relative;
+      width: min(1180px, 100%);
+      min-height: min(760px, calc(100vh - 100px));
+      margin: 0 auto;
+      padding: clamp(42px, 7vw, 78px);
+      overflow: hidden;
+      border: 1px solid var(--gold);
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .certificate::before,
+    .certificate::after {
+      position: absolute;
+      content: "";
+      pointer-events: none;
+    }
+
+    .certificate::before {
+      inset: 13px;
+      border: 2px solid var(--navy);
+    }
+
+    .certificate::after {
+      inset: 22px;
+      border: 1px solid var(--gold-light);
+    }
+
+    .corner {
+      position: absolute;
+      z-index: 0;
+      width: 140px;
+      height: 140px;
+      border: 20px solid rgba(0, 43, 73, .045);
+      transform: rotate(45deg);
+    }
+
+    .corner.top { top: -83px; left: -83px; }
+    .corner.bottom { right: -83px; bottom: -83px; }
+
+    .certificate-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .certificate-logo {
+      position: absolute;
+      z-index: 2;
+      bottom: 44px;
+      left: 54px;
+      display: grid;
+      width: 90px;
+      height: 90px;
+      place-items: center;
+    }
+
+    .certificate-logo img {
+      display: block;
+      max-width: 140px;
+      max-height: 90px;
+      object-fit: contain;
+    }
+
+    .certificate-logo .brand-mark {
+      width: 82px;
+      height: 82px;
+      margin: 0;
+    }
+
+    .organization {
+      margin-bottom: 18px;
+      color: var(--navy);
+      font-size: clamp(.72rem, 1.3vw, .88rem);
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .certificate-title {
+      margin-bottom: 9px;
+      color: var(--navy);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(2.3rem, 5.3vw, 4.9rem);
+      line-height: .98;
+    }
+
+    .presented {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: Georgia, serif;
+      font-size: clamp(.9rem, 1.5vw, 1.05rem);
+      font-style: italic;
+    }
+
+    .attended {
+      margin: -5px 0 20px;
+      color: var(--muted);
+      font-family: Georgia, serif;
+      font-size: clamp(.9rem, 1.5vw, 1.05rem);
+      font-style: italic;
+    }
+
+    .recipient-name {
+      min-width: min(560px, 80%);
+      margin: 0 auto 14px;
+      padding: 0 22px 9px;
+      border-bottom: 1px solid var(--gold);
+      color: var(--navy);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(2rem, 4.8vw, 4rem);
+      line-height: 1.08;
+      overflow-wrap: anywhere;
+    }
+
+    .event-name {
+      max-width: 800px;
+      margin: 0 auto 13px;
+      color: var(--navy);
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      line-height: 1.18;
+    }
+
+    .event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px 18px;
+      margin-bottom: 20px;
+      color: var(--muted);
+      font-size: clamp(.78rem, 1.3vw, .92rem);
+    }
+
+    .event-meta span + span::before {
+      margin-right: 18px;
+      color: var(--gold);
+      content: "◆";
+      font-size: .48rem;
+      vertical-align: middle;
+    }
+
+    .certificate-footer {
+      display: grid;
+      width: min(790px, 100%);
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(30px, 10vw, 120px);
+      align-items: end;
+    }
+
+    .silver-seal {
+      position: absolute;
+      z-index: 2;
+      bottom: 34px;
+      left: 50%;
+      display: grid;
+      width: 104px;
+      height: 104px;
+      place-items: center;
+      clip-path: polygon(50% 0, 57% 8%, 66% 3%, 70% 14%, 81% 10%, 82% 22%, 94% 22%, 91% 34%, 100% 40%, 93% 50%, 100% 60%, 91% 66%, 94% 78%, 82% 78%, 81% 90%, 70% 86%, 66% 97%, 57% 92%, 50% 100%, 43% 92%, 34% 97%, 30% 86%, 19% 90%, 18% 78%, 6% 78%, 9% 66%, 0 60%, 7% 50%, 0 40%, 9% 34%, 6% 22%, 18% 22%, 19% 10%, 30% 14%, 34% 3%, 43% 8%);
+      background: repeating-conic-gradient(from 5deg, #777f85 0 7deg, #f7f8f8 12deg, #aab1b6 18deg);
+      filter: drop-shadow(0 4px 5px rgba(0, 43, 73, .22));
+      transform: translateX(-50%);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .seal-face {
+      position: relative;
+      display: grid;
+      width: 78px;
+      height: 78px;
+      place-items: center;
+      border: 1px solid #7c858b;
+      border-radius: 50%;
+      color: #6b7378;
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255, 255, 255, .95), rgba(197, 202, 205, .88) 46%, rgba(241, 243, 244, .95) 72%),
+        repeating-conic-gradient(#8d959a 0 5deg, #fff 7deg 11deg);
+      box-shadow:
+        inset 2px 2px 5px rgba(255, 255, 255, .9),
+        inset -3px -3px 6px rgba(70, 78, 84, .38),
+        0 0 0 4px rgba(225, 228, 230, .82),
+        0 0 0 5px rgba(91, 100, 106, .48);
+      font-family: Georgia, serif;
+      font-size: .39rem;
+      font-weight: 700;
+      letter-spacing: .07em;
+      line-height: 1.15;
+      text-align: center;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, .95), 0 -1px 1px rgba(55, 62, 67, .6);
+      text-transform: uppercase;
+    }
+
+    .seal-face::before {
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(90, 99, 105, .52);
+      border-radius: 50%;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, .85), inset 0 1px 2px rgba(67, 75, 80, .28);
+      content: "";
+    }
+
+    .seal-copy {
+      z-index: 1;
+      width: 58px;
+      padding: 4px 0 3px;
+      border-top: 1px solid rgba(88, 96, 101, .5);
+      border-bottom: 1px solid rgba(88, 96, 101, .5);
+      box-shadow: inset 0 1px rgba(255, 255, 255, .55), 0 1px rgba(255, 255, 255, .55);
+    }
+
+    .seal-copy strong {
+      display: block;
+      margin-bottom: 2px;
+      font-size: .92rem;
+      letter-spacing: .06em;
+    }
+
+    .credential-block {
+      padding-top: 9px;
+      border-top: 1px solid var(--navy);
+    }
+
+    .signature {
+      margin: 0 0 -2px;
+      color: var(--navy);
+      font-family: Allura, "Brush Script MT", cursive;
+      font-size: clamp(2rem, 3.6vw, 2.8rem);
+      font-weight: 400;
+      line-height: .8;
+    }
+
+    .credential-label {
+      margin: 5px 0 0;
+      color: var(--ink);
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    .credential-detail {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: .68rem;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 720px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      .link-result { grid-template-columns: 1fr 1fr; }
+      .link-result input { grid-column: 1 / -1; }
+      .certificate { min-height: calc(100vh - 96px); padding: 52px 34px 145px; }
+      .certificate-footer { grid-template-columns: 1fr; gap: 28px; }
+      .silver-seal { bottom: 28px; width: 78px; height: 78px; }
+      .seal-face { width: 59px; height: 59px; font-size: .34rem; }
+      .seal-face::before { inset: 5px; }
+      .seal-copy { width: 42px; padding: 2px 0; }
+      .seal-copy strong { font-size: .7rem; }
+      .certificate-logo { bottom: 24px; left: 30px; width: 72px; height: 72px; }
+      .certificate-logo img { max-width: 72px; max-height: 72px; }
+      .certificate-logo .brand-mark { width: 60px; height: 60px; font-size: .9rem; }
+      .recipient-name { min-width: 90%; }
+      .event-meta { display: grid; }
+      .event-meta span + span::before { display: none; }
+    }
+
+    @media print {
+      @page { size: A4 landscape; margin: 0; }
+
+      html, body {
+        width: 297mm;
+        height: 210mm;
+        background: #fff;
+      }
+
+      body * { visibility: hidden; }
+
+      .certificate,
+      .certificate * {
+        visibility: visible;
+      }
+
+      .admin-shell,
+      .claim-view,
+      .certificate-actions {
+        display: none !important;
+      }
+
+      .recipient-shell,
+      .certificate-view {
+        display: block !important;
+        min-height: 0;
+        padding: 0;
+      }
+
+      .certificate {
+        position: fixed;
+        inset: 0;
+        width: 297mm;
+        height: 210mm;
+        min-height: 0;
+        padding: 20mm 24mm 16mm;
+        border: 0;
+        box-shadow: none;
+      }
+
+      .certificate-title { font-size: 15mm; }
+      .recipient-name { font-size: 10mm; }
+      .event-name { font-size: 6.5mm; }
+      .certificate-footer { width: 190mm; }
+      .silver-seal { bottom: 10mm; }
+      .certificate-logo { bottom: 11mm; left: 15mm; }
+    }
+  </style>
+</head>
+<body>
+  <main id="accessView" class="recipient-shell">
+    <section class="claim-view">
+      <div class="claim-card">
+        <div class="brand-mark" aria-hidden="true">VSNA</div>
+        <p class="eyebrow">Certificate of Attendance</p>
+        <h1>Certificate link required</h1>
+        <p class="claim-copy">Please open the personalised event link supplied by the Victorian School Nurses Association.</p>
+      </div>
+    </section>
+  </main>
+
+  <main id="adminView" class="admin-shell" hidden>
+    <header class="admin-header">
+      <p class="eyebrow">Victorian School Nurses Association</p>
+      <h1>Certificate Generator</h1>
+      <p class="intro">Enter your professional development event details, then create a private shareable link for attendees. No certificate data is stored or uploaded.</p>
+    </header>
+
+    <section class="admin-card" aria-labelledby="generatorHeading">
+      <h2 id="generatorHeading" hidden>Event details</h2>
+      <form id="eventForm">
+        <div class="form-grid">
+          <div class="field full">
+            <label for="event">Event Name</label>
+            <input id="event" name="event" type="text" required autocomplete="off" placeholder="e.g. Supporting Student Wellbeing">
+          </div>
+
+          <div class="field">
+            <label for="date">Date</label>
+            <input id="date" name="date" type="date" required>
+          </div>
+
+          <div class="field">
+            <label for="start">Start Time</label>
+            <input id="start" name="start" type="time" required>
+          </div>
+
+          <div class="field">
+            <label for="end">End Time</label>
+            <input id="end" name="end" type="time" required>
+          </div>
+
+          <div class="field">
+            <label for="presenter">Presenter Name</label>
+            <input id="presenter" name="presenter" type="text" required autocomplete="name" placeholder="e.g. Dr Jane Smith">
+          </div>
+
+          <div class="field">
+            <label for="points">CPD Points</label>
+            <input id="points" name="points" type="number" min="0.25" step="0.25" value="1" required>
+          </div>
+
+          <div class="field">
+            <label for="signatory">Signatory Name</label>
+            <input id="signatory" name="signatory" type="text" value="VSNA President" required>
+          </div>
+
+          <div class="field">
+            <label for="position">Signatory Position</label>
+            <input id="position" name="position" type="text" value="President, Victorian School Nurses Association" required>
+          </div>
+
+          <div class="field full">
+            <label for="logo">Logo URL or Base64 Image</label>
+            <input id="logo" name="logo" type="text" inputmode="url" placeholder="https://example.com/vsna-logo.png">
+            <p class="hint">Optional. Use a public image URL or a data:image Base64 value. A VSNA monogram is shown when left blank.</p>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="button primary" type="submit">Generate Shareable Link</button>
+        </div>
+      </form>
+
+      <div id="linkResult" class="link-result" hidden>
+        <label for="shareUrl" hidden>Generated shareable link</label>
+        <input id="shareUrl" type="text" readonly>
+        <button id="copyLink" class="button secondary" type="button">Copy Link</button>
+        <a id="previewLink" class="button secondary" href="#" target="_blank" rel="noopener">Preview</a>
+      </div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <main id="recipientView" class="recipient-shell" hidden>
+    <section id="claimView" class="claim-view">
+      <div class="claim-card">
+        <div class="claim-logo">
+          <img id="claimLogoImage" alt="VSNA logo" hidden>
+          <div id="claimLogoFallback" class="brand-mark" aria-hidden="true">VSNA</div>
+        </div>
+        <p class="eyebrow">CPD Certificate</p>
+        <h1>Welcome!</h1>
+        <p class="claim-copy">Enter your full name to download your Certificate of Attendance for <strong id="claimEvent"></strong>.</p>
+        <form id="claimForm" class="claim-form">
+          <label for="fullName">Full Name</label>
+          <input id="fullName" type="text" required minlength="2" maxlength="100" pattern=".*\S.*" autocomplete="name" placeholder="Your full name" autofocus>
+          <button class="button primary" type="submit">View Certificate</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="certificateView" class="certificate-view" hidden>
+      <div class="certificate-actions">
+        <button id="backToName" class="button secondary" type="button">Back</button>
+        <button id="printCertificate" class="button primary" type="button">Print / Save as PDF</button>
+      </div>
+
+      <article id="certificate" class="certificate" aria-label="VSNA CPD Certificate">
+        <span class="corner top" aria-hidden="true"></span>
+        <span class="corner bottom" aria-hidden="true"></span>
+        <div class="silver-seal" aria-label="VSNA Professional Development seal">
+          <div class="seal-face"><span class="seal-copy"><strong>VSNA</strong>Professional<br>Development</span></div>
+        </div>
+        <div id="certificateLogo" class="certificate-logo">
+          <img id="logoImage" alt="VSNA logo" hidden>
+          <div id="logoFallback" class="brand-mark" aria-hidden="true">VSNA</div>
+        </div>
+        <div class="certificate-content">
+          <header>
+            <p class="organization">Victorian School Nurses Association</p>
+            <h1 class="certificate-title">Certificate of Attendance</h1>
+            <p class="presented">This certificate confirms that</p>
+            <p id="recipientName" class="recipient-name"></p>
+            <p class="attended">attended the following PD session</p>
+          </header>
+
+          <div>
+            <h2 id="certificateEvent" class="event-name"></h2>
+            <div class="event-meta">
+              <span id="certificateDateTime"></span>
+              <span id="certificatePresenter"></span>
+              <span id="certificatePoints"></span>
+            </div>
+          </div>
+
+          <footer class="certificate-footer">
+            <div class="credential-block">
+              <p id="certificateSignature" class="signature"></p>
+              <p id="certificatePosition" class="credential-label"></p>
+              <p class="credential-detail">Authorised signatory</p>
+            </div>
+            <div class="credential-block">
+              <p id="signedDate" class="credential-label"></p>
+              <p class="credential-detail">Date signed</p>
+            </div>
+          </footer>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const $ = (id) => document.getElementById(id);
+      const hash = new URLSearchParams(location.hash.slice(1));
+      const isCreator = new URLSearchParams(location.search).get("creator") === "true";
+      const isRecipient = hash.has("event") && hash.get("event").trim();
+
+      const formatDate = (value) => {
+        if (!value) return "";
+        const [year, month, day] = value.split("-").map(Number);
+        return new Intl.DateTimeFormat("en-AU", {
+          day: "numeric", month: "long", year: "numeric"
+        }).format(new Date(year, month - 1, day));
+      };
+
+      const formatTime = (value) => {
+        if (!value) return "";
+        const [hour, minute] = value.split(":").map(Number);
+        return new Intl.DateTimeFormat("en-AU", {
+          hour: "numeric", minute: "2-digit"
+        }).format(new Date(2000, 0, 1, hour, minute));
+      };
+
+      const safeLogo = (value) =>
+        /^(https?:\/\/|data:image\/(?:png|jpeg|jpg|gif|webp|svg\+xml)[;,])/i.test(value || "")
+          ? value
+          : "";
+
+      if (isCreator) {
+        $("accessView").hidden = true;
+        $("adminView").hidden = false;
+
+        const validateTimes = () => {
+          $("end").setCustomValidity($("start").value && $("end").value <= $("start").value
+            ? "End time must be after the start time."
+            : "");
+        };
+        $("start").addEventListener("input", validateTimes);
+        $("end").addEventListener("input", validateTimes);
+
+        $("eventForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          const params = new URLSearchParams();
+          new FormData(event.currentTarget).forEach((value, key) => {
+            const clean = String(value).trim();
+            if (clean) params.set(key, clean);
+          });
+
+          const url = new URL(location.href);
+          url.search = "";
+          url.hash = params;
+          $("shareUrl").value = url.href;
+          $("previewLink").href = url.href;
+          $("linkResult").hidden = false;
+          $("status").textContent = "Shareable link generated. Certificate details are stored only in this URL.";
+        });
+
+        $("copyLink").addEventListener("click", async () => {
+          const input = $("shareUrl");
+          try {
+            await navigator.clipboard.writeText(input.value);
+            $("status").textContent = "Link copied to clipboard.";
+          } catch {
+            input.select();
+            document.execCommand("copy");
+            $("status").textContent = "Link copied to clipboard.";
+          }
+        });
+        return;
+      }
+
+      if (!isRecipient) return;
+
+      $("accessView").hidden = true;
+      $("recipientView").hidden = false;
+
+      const data = {
+        event: hash.get("event").trim(),
+        date: hash.get("date") || "",
+        start: hash.get("start") || hash.get("time") || "",
+        end: hash.get("end") || "",
+        presenter: hash.get("presenter") || "",
+        points: Number(hash.get("points") || hash.get("hours")) || 1,
+        signatory: hash.get("signatory") || "VSNA President",
+        position: hash.get("position") || "President, Victorian School Nurses Association",
+        logo: safeLogo(hash.get("logo")) || "vsna-logo.png"
+      };
+
+      $("claimEvent").textContent = data.event;
+      $("certificateEvent").textContent = data.event;
+      $("certificateDateTime").textContent = [
+        formatDate(data.date),
+        [formatTime(data.start), formatTime(data.end)].filter(Boolean).join(" – ")
+      ].filter(Boolean).join(" · ");
+      $("certificatePresenter").textContent = data.presenter ? `Presented by ${data.presenter}` : "";
+      $("certificatePoints").textContent = `${data.points} CPD Point${data.points === 1 ? "" : "s"}`;
+      $("certificateSignature").textContent = data.signatory;
+      $("certificatePosition").textContent = data.position;
+      $("signedDate").textContent = formatDate(data.date);
+
+      if (data.logo) {
+        [["claimLogoImage", "claimLogoFallback"], ["logoImage", "logoFallback"]].forEach(([imageId, fallbackId]) => {
+          $(imageId).src = data.logo;
+          $(imageId).hidden = false;
+          $(fallbackId).hidden = true;
+          $(imageId).addEventListener("error", () => {
+            $(imageId).hidden = true;
+            $(fallbackId).hidden = false;
+          });
+        });
+      }
+
+      $("claimForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = $("fullName").value.trim();
+        if (!name) return;
+        $("recipientName").textContent = name;
+        $("claimView").hidden = true;
+        $("certificateView").hidden = false;
+        document.title = `${name} — VSNA CPD Certificate`;
+        window.scrollTo(0, 0);
+      });
+
+      $("printCertificate").addEventListener("click", () => window.print());
+      $("backToName").addEventListener("click", () => {
+        $("certificateView").hidden = true;
+        $("claimView").hidden = false;
+        $("fullName").focus();
+      });
+    })();
+  </script>
+</body>
+</html>
