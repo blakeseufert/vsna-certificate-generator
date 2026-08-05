@@ -35,7 +35,7 @@
       font-family: Inter, system-ui, sans-serif;
     }
 
-    button, input { font: inherit; }
+    button, input, textarea { font: inherit; }
     button, a { -webkit-tap-highlight-color: transparent; }
     [hidden] { display: none !important; }
 
@@ -103,7 +103,7 @@
       font-weight: 700;
     }
 
-    input {
+    input, textarea {
       width: 100%;
       min-height: 48px;
       padding: 11px 13px;
@@ -115,9 +115,14 @@
       transition: border-color .18s, box-shadow .18s;
     }
 
-    input:focus {
+    input:focus, textarea:focus {
       border-color: var(--gold);
       box-shadow: 0 0 0 3px rgba(197, 160, 89, .18);
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
     }
 
     .hint {
@@ -466,6 +471,7 @@
       font-family: "Playfair Display", Georgia, serif;
       font-size: clamp(1.5rem, 3vw, 2.5rem);
       line-height: 1.18;
+      white-space: pre-line;
     }
 
     .event-meta {
@@ -559,17 +565,26 @@
     }
 
     .credential-block {
-      padding-top: 9px;
-      border-top: 1px solid var(--navy);
+      padding-top: 0;
+    }
+
+    .signature-line {
+      width: min(320px, 100%);
+      margin: 0 auto;
+      padding: 0 14px 7px;
+      border-bottom: 1px solid var(--navy);
     }
 
     .signature {
-      margin: 0 0 -2px;
+      margin: 0;
       color: var(--navy);
       font-family: Allura, "Brush Script MT", cursive;
-      font-size: clamp(2rem, 3.6vw, 2.8rem);
+      font-size: clamp(2.4rem, 4.2vw, 3.35rem);
       font-weight: 400;
-      line-height: .8;
+      letter-spacing: -.035em;
+      line-height: .72;
+      text-shadow: .5px .35px 0 rgba(0, 43, 73, .45);
+      transform: rotate(-2deg) skewX(-5deg);
     }
 
     .credential-label {
@@ -694,7 +709,8 @@
         <div class="form-grid">
           <div class="field full">
             <label for="event">Event Name</label>
-            <input id="event" name="event" type="text" required autocomplete="off" placeholder="e.g. Supporting Student Wellbeing">
+            <textarea id="event" name="event" rows="2" maxlength="160" required placeholder="e.g. Supporting Student&#10;Wellbeing"></textarea>
+            <p class="hint">Press Enter where you want the certificate title to split across two lines.</p>
           </div>
 
           <div class="field">
@@ -816,7 +832,7 @@
 
           <footer class="certificate-footer">
             <div class="credential-block">
-              <p id="certificateSignature" class="signature"></p>
+              <div class="signature-line"><p id="certificateSignature" class="signature"></p></div>
               <p id="certificatePosition" class="credential-label"></p>
               <p class="credential-detail signed-date">Date signed: <span id="signedDate"></span></p>
             </div>
