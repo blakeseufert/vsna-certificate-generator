@@ -28,6 +28,7 @@ jobs:
           HTMLParser().feed(html)
           assert Path("vsna-logo.png").stat().st_size > 0
           assert 'get("creator") === "true"' in html
+          assert '++creatorClicks === 5' in html
           PY
           awk '/<script>/{inside=1; next} /<\/script>/{inside=0} inside' index.html | node --check
       - run: mkdir _site && cp index.html vsna-logo.png _site/
