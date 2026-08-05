@@ -278,10 +278,12 @@
 
     .certificate {
       position: relative;
-      width: min(1180px, 100%);
-      min-height: min(760px, calc(100vh - 100px));
+      display: grid;
+      width: min(1180px, 100%, calc((100vh - 70px) * 1.414));
+      min-height: 560px;
       margin: 0 auto;
-      padding: clamp(42px, 7vw, 78px);
+      padding: clamp(44px, 5.5vw, 70px);
+      aspect-ratio: 297 / 210;
       overflow: hidden;
       border: 1px solid var(--gold);
       background: var(--paper);
@@ -321,11 +323,12 @@
     .certificate-content {
       position: relative;
       z-index: 1;
-      display: flex;
-      min-height: 100%;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
+      display: grid;
+      height: 100%;
+      grid-template-rows: auto auto auto;
+      align-content: space-between;
+      justify-items: center;
+      gap: clamp(24px, 5vh, 56px);
     }
 
     .certificate-logo {
@@ -365,7 +368,7 @@
     .certificate-header { padding-top: 100px; }
 
     .certificate-title {
-      margin-bottom: 9px;
+      margin-bottom: clamp(10px, 1.5vh, 16px);
       color: var(--navy);
       font-family: "Playfair Display", Georgia, serif;
       font-size: clamp(2.3rem, 5.3vw, 4.9rem);
@@ -381,7 +384,7 @@
     }
 
     .attended {
-      margin: -5px 0 20px;
+      margin: -5px 0 0;
       color: var(--muted);
       font-family: Georgia, serif;
       font-size: clamp(.9rem, 1.5vw, 1.05rem);
@@ -402,7 +405,7 @@
 
     .event-name {
       max-width: 800px;
-      margin: 0 auto 13px;
+      margin: 0 auto clamp(12px, 2vh, 20px);
       color: var(--navy);
       font-family: "Playfair Display", Georgia, serif;
       font-size: clamp(1.5rem, 3vw, 2.5rem);
@@ -414,7 +417,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 7px 18px;
-      margin-bottom: 20px;
+      margin-bottom: 0;
       color: var(--muted);
       font-size: clamp(.78rem, 1.3vw, .92rem);
     }
@@ -428,11 +431,7 @@
     }
 
     .certificate-footer {
-      display: grid;
-      width: min(790px, 100%);
-      grid-template-columns: 1fr 1fr;
-      gap: clamp(30px, 10vw, 120px);
-      align-items: end;
+      width: min(390px, 75%);
     }
 
     .silver-seal {
@@ -531,13 +530,21 @@
       line-height: 1.35;
     }
 
+    .signed-date { margin-top: 10px; }
+
     @media (max-width: 720px) {
       .form-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
       .link-result { grid-template-columns: 1fr 1fr; }
       .link-result input { grid-column: 1 / -1; }
-      .certificate { min-height: calc(100vh - 96px); padding: 52px 34px 145px; }
-      .certificate-footer { grid-template-columns: 1fr; gap: 28px; }
+      .certificate {
+        width: 100%;
+        min-height: max(820px, calc(100vh - 24px));
+        padding: 52px 30px 48px;
+        aspect-ratio: auto;
+      }
+      .certificate-content { gap: clamp(30px, 6vh, 52px); }
+      .certificate-footer { width: min(390px, 100%); }
       .silver-seal { top: 32px; right: 28px; width: 78px; height: 78px; }
       .seal-face { width: 59px; height: 59px; font-size: .34rem; }
       .seal-face::before { inset: 5px; }
@@ -589,6 +596,7 @@
         height: 210mm;
         min-height: 0;
         padding: 20mm 24mm 16mm;
+        aspect-ratio: auto;
         border: 0;
         box-shadow: none;
       }
@@ -596,7 +604,8 @@
       .certificate-title { font-size: 15mm; }
       .recipient-name { font-size: 10mm; }
       .event-name { font-size: 6.5mm; }
-      .certificate-footer { width: 190mm; }
+      .certificate-content { gap: 10mm; }
+      .certificate-footer { width: 100mm; }
       .silver-seal { top: 11mm; right: 13mm; }
       .certificate-logo { top: 12mm; left: 15mm; width: 45mm; }
       .certificate-logo img { max-width: 42mm; max-height: 18mm; }
@@ -732,24 +741,20 @@
             <p class="attended">attended the following PD session</p>
           </header>
 
-          <div>
+          <section class="event-details" aria-label="Professional development session details">
             <h2 id="certificateEvent" class="event-name"></h2>
             <div class="event-meta">
               <span id="certificateDateTime"></span>
               <span id="certificatePresenter"></span>
               <span id="certificatePoints"></span>
             </div>
-          </div>
+          </section>
 
           <footer class="certificate-footer">
             <div class="credential-block">
               <p id="certificateSignature" class="signature"></p>
               <p id="certificatePosition" class="credential-label"></p>
-              <p class="credential-detail">Authorised signatory</p>
-            </div>
-            <div class="credential-block">
-              <p id="signedDate" class="credential-label"></p>
-              <p class="credential-detail">Date signed</p>
+              <p class="credential-detail signed-date">Date signed: <span id="signedDate"></span></p>
             </div>
           </footer>
         </div>
