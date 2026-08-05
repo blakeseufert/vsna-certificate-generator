@@ -127,6 +127,50 @@
       line-height: 1.45;
     }
 
+    .switch-label {
+      display: flex;
+      width: fit-content;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .switch-label input {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      min-height: 24px;
+      padding: 0;
+      flex: none;
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      background: #cbd2d7;
+      box-shadow: inset 0 0 0 1px rgba(0, 43, 73, .12);
+      cursor: pointer;
+    }
+
+    .switch-label input::before {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 43, 73, .25);
+      content: "";
+      transition: transform .18s;
+    }
+
+    .switch-label input:checked { background: var(--navy); }
+    .switch-label input:checked::before { transform: translateX(20px); }
+
+    .switch-label input:focus-visible {
+      outline: 3px solid rgba(197, 160, 89, .35);
+      outline-offset: 3px;
+    }
+
     .actions {
       display: flex;
       flex-wrap: wrap;
@@ -689,9 +733,17 @@
           </div>
 
           <div class="field full">
+            <label class="switch-label" for="customLogo">
+              <input id="customLogo" type="checkbox" role="switch" aria-controls="logoField">
+              <span>Custom Logo</span>
+            </label>
+            <p class="hint">Turn on to replace the default VSNA logo for this certificate.</p>
+          </div>
+
+          <div id="logoField" class="field full" hidden>
             <label for="logo">Logo URL or Base64 Image</label>
-            <input id="logo" name="logo" type="text" inputmode="url" placeholder="https://example.com/vsna-logo.png">
-            <p class="hint">Optional. Use a public image URL or a data:image Base64 value. A VSNA monogram is shown when left blank.</p>
+            <input id="logo" name="logo" type="text" inputmode="url" placeholder="https://example.com/vsna-logo.png" disabled>
+            <p class="hint">Use a public image URL or a data:image Base64 value.</p>
           </div>
         </div>
 
@@ -813,6 +865,12 @@
         };
         $("start").addEventListener("input", validateTimes);
         $("end").addEventListener("input", validateTimes);
+
+        $("customLogo").addEventListener("change", () => {
+          $("logoField").hidden = !$("customLogo").checked;
+          $("logo").disabled = !$("customLogo").checked;
+          if ($("customLogo").checked) $("logo").focus();
+        });
 
         $("eventForm").addEventListener("submit", (event) => {
           event.preventDefault();
