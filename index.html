@@ -389,7 +389,7 @@
       grid-template-rows: auto auto auto;
       align-content: space-between;
       justify-items: center;
-      gap: clamp(24px, 5vh, 56px);
+      gap: clamp(16px, 3vw, 36px);
     }
 
     .certificate-logo {
@@ -618,7 +618,7 @@
         padding: 52px 30px 48px;
         aspect-ratio: auto;
       }
-      .certificate-content { gap: clamp(30px, 6vh, 52px); }
+      .certificate-content { gap: clamp(20px, 4vw, 32px); }
       .certificate-footer { width: min(390px, 100%); }
       .silver-seal { top: 32px; right: 28px; width: 78px; height: 78px; }
       .seal-face { width: 59px; height: 59px; font-size: .34rem; }
@@ -660,7 +660,7 @@
       .recipient-shell,
       .certificate-view {
         display: block !important;
-        min-height: 0;
+        min-height: 0 !important;
         padding: 0;
       }
 
@@ -679,7 +679,7 @@
       .certificate-title { font-size: 15mm; }
       .recipient-name { font-size: 10mm; }
       .event-name { font-size: 6.5mm; }
-      .certificate-content { gap: 10mm; }
+      .certificate-content { gap: 6mm; }
       .certificate-footer { width: 100mm; }
       .silver-seal { top: 11mm; right: 13mm; }
       .certificate-logo { top: 12mm; left: 15mm; width: 45mm; }
@@ -970,7 +970,16 @@
           signature.style.fontSize = `${parseFloat(getComputedStyle(signature).fontSize) * available / signature.scrollWidth * .94}px`;
         }
       };
-      window.addEventListener("resize", fitSignature);
+
+      const fitCertificate = () => {
+        const certificate = $("certificate");
+        const content = certificate.querySelector(".certificate-content");
+        certificate.style.minHeight = "";
+        fitSignature();
+        const overflow = content.scrollHeight - content.clientHeight;
+        if (overflow > 0) certificate.style.minHeight = `${certificate.offsetHeight + overflow + 16}px`;
+      };
+      window.addEventListener("resize", fitCertificate);
 
       if (data.logo) {
         [["claimLogoImage", "claimLogoFallback"], ["logoImage", "logoFallback"]].forEach(([imageId, fallbackId]) => {
@@ -991,8 +1000,8 @@
         $("recipientName").textContent = name;
         $("claimView").hidden = true;
         $("certificateView").hidden = false;
-        requestAnimationFrame(fitSignature);
-        document.fonts.ready.then(fitSignature);
+        requestAnimationFrame(fitCertificate);
+        document.fonts.ready.then(fitCertificate);
         document.title = `${name} — VSNA CPD Certificate`;
         window.scrollTo(0, 0);
       });
