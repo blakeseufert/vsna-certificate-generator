@@ -7,7 +7,7 @@
   <title>VSNA Certificate Generator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Allura&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mrs+Saint+Delafield&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --navy: #002b49;
@@ -569,22 +569,26 @@
     }
 
     .signature-line {
-      width: min(320px, 100%);
+      width: min(420px, 100%);
       margin: 0 auto;
       padding: 0 14px 7px;
       border-bottom: 1px solid var(--navy);
     }
 
     .signature {
+      display: inline-block;
       margin: 0;
       color: var(--navy);
-      font-family: Allura, "Brush Script MT", cursive;
-      font-size: clamp(2.4rem, 4.2vw, 3.35rem);
+      font-family: "Mrs Saint Delafield", "Segoe Script", cursive;
+      font-size: clamp(2.8rem, 5vw, 4rem);
       font-weight: 400;
-      letter-spacing: -.035em;
-      line-height: .72;
-      text-shadow: .5px .35px 0 rgba(0, 43, 73, .45);
-      transform: rotate(-2deg) skewX(-5deg);
+      letter-spacing: .01em;
+      line-height: .65;
+      opacity: .92;
+      text-shadow: .35px .3px 0 rgba(0, 43, 73, .35);
+      transform: rotate(-3deg) skewX(-3deg);
+      transform-origin: center;
+      white-space: nowrap;
     }
 
     .credential-label {
@@ -740,7 +744,7 @@
 
           <div class="field">
             <label for="signatory">Signatory Name</label>
-            <input id="signatory" name="signatory" type="text" placeholder="Name of current VSNA President" required>
+            <input id="signatory" name="signatory" type="text" maxlength="80" placeholder="Name of current VSNA President" required>
           </div>
 
           <div class="field">
@@ -957,6 +961,17 @@
       $("certificatePosition").textContent = data.position;
       $("signedDate").textContent = formatDate(data.date);
 
+      const fitSignature = () => {
+        const signature = $("certificateSignature");
+        const line = signature.parentElement;
+        signature.style.fontSize = "";
+        const available = line.clientWidth - 28;
+        if (available && signature.scrollWidth > available) {
+          signature.style.fontSize = `${parseFloat(getComputedStyle(signature).fontSize) * available / signature.scrollWidth * .94}px`;
+        }
+      };
+      window.addEventListener("resize", fitSignature);
+
       if (data.logo) {
         [["claimLogoImage", "claimLogoFallback"], ["logoImage", "logoFallback"]].forEach(([imageId, fallbackId]) => {
           $(imageId).src = data.logo;
@@ -976,6 +991,8 @@
         $("recipientName").textContent = name;
         $("claimView").hidden = true;
         $("certificateView").hidden = false;
+        requestAnimationFrame(fitSignature);
+        document.fonts.ready.then(fitSignature);
         document.title = `${name} — VSNA CPD Certificate`;
         window.scrollTo(0, 0);
       });
