@@ -33,7 +33,7 @@ jobs:
           assert '<textarea id="event"' in html and 'white-space: pre-line' in html
           assert 'Name of current VSNA President' in html and '$("date").value = `' in html
           assert 'white-space: nowrap' in html and 'const fitSignature = () =>' in html
-          assert 'const fitCertificate = () =>' in html and 'content.scrollHeight - content.clientHeight' in html
+          assert 'min-width: 297mm' in html and 'const fitCertificate = () =>' not in html
           PY
           awk '/<script>/{inside=1; next} /<\/script>/{inside=0} inside' index.html | node --check
       - run: mkdir _site && cp index.html vsna-logo.png _site/
